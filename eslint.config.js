@@ -13,5 +13,6 @@ export default defineConfig([
       'no-unused-vars': ['error', { args: 'none' }],
       'no-undef': 'error',
     },
+    lint: 'eslint .',
   },
 ]);
