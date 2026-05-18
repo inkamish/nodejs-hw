@@ -2,11 +2,6 @@ import { Note } from '../models/note.js';
 import createHttpError from 'http-errors';
 import { TAGS } from '../constants/tags.js';
 
-export const getAllNotes = async (req, res) => {
-  const notes = await Note.find();
-  res.status(200).json(notes);
-};
-
 export const getNoteById = async (req, res) => {
   const { noteId } = req.params;
   const note = await Note.findById(noteId);
@@ -17,15 +12,15 @@ export const getNoteById = async (req, res) => {
 
   res.status(200).json(note);
 };
-
-export const getNotes = async (req, res) => {
+export const getAllNotes = async (req, res) => {
   const { page = 1, perPage = 10, tag, search } = req.query;
+
   const skip = (page - 1) * perPage;
 
-  const notesQuery = Note.find();
+  const query = Note.find();
 
   if (search) {
-    notesQuery.where({
+    query.where({
       $or: [
         { title: { $regex: search, $options: 'i' } },
         { content: { $regex: search, $options: 'i' } },
@@ -38,20 +33,20 @@ export const getNotes = async (req, res) => {
       throw createHttpError(400, 'Invalid tag');
     }
 
-    notesQuery.where('tag').equals(tag);
+    query.where('tag').equals(tag);
   }
 
-  const [totalItems, notes] = await Promise.all([
-    notesQuery.clone().countDocuments(),
-    notesQuery.skip(skip).limit(perPage),
+  const [totalNotes, notes] = await Promise.all([
+    query.clone().countDocuments(),
+    query.skip(skip).limit(perPage),
   ]);
 
-  const totalPages = Math.ceil(totalItems / perPage);
+  const totalPages = Math.ceil(totalNotes / perPage);
 
   res.status(200).json({
     page,
     perPage,
-    totalItems,
+    totalNotes,
     totalPages,
     notes,
   });
