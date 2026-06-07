@@ -14,10 +14,9 @@ const userSchema = new Schema(
   { timestamps: true },
 );
 
-userSchema.pre('save', async function () {
-  if (!this.username) {
-    this.username = this.email;
-  }
+userSchema.pre('save', function (next) {
+  this.username = this.email;
+  next();
 });
 
 userSchema.methods.toJSON = function () {
