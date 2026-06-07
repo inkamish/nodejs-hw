@@ -14,6 +14,7 @@ export const saveFileToCloudinary = (buffer, userId) => {
         public_id: String(userId),
         overwrite: true,
         resource_type: 'image',
+        unique_filename: false,
       },
       (error, result) => {
         if (error) {
